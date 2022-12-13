@@ -1,0 +1,18 @@
+---
+- name: Check for needed dependencies for prometheus
+  block:
+    - name: Install needed services & update the system
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        update_cache: true
+        autoremove: true
+        clean: true
+      with_items:
+        - "'"
+        - "nginx"
+    - name: Check for default directories & create them
+      ansible.builtin.file:
+        path: "{{ directories.config }}"
+        state: directory
+        owner: "{{ prometheus.user }}"
+        group: "{{ prometheus.group }}"

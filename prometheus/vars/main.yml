@@ -1,0 +1,8 @@
+---
+# vars file for prometheus
+directories:
+  config: /etc/prometheus
+
+prometheus:
+  user: prometheus
+  group: "{{ prometheus.user }}"
