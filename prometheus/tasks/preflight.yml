@@ -1,5 +1,9 @@
 ---
-- name: Check for needed dependencies for prometheus
+- name: Check For Needed Dependencies For Prometheus
+  tags:
+    - prometheus_prometheus.directories
+    - prometheus_user
+    - prometheus_group
   block:
     - name: Install needed services & update the system
       ansible.builtin.apt:
@@ -10,9 +14,100 @@
       with_items:
         - "'"
         - "nginx"
+
+    - name: Create Prometheus user & group
+      ansible.builtin.group:
+        name: "{{ prometheus.group }}"
+        state: present
+
+    - name: Create Prometheus user
+      ansible.builtin.user:
+        name: "{{ prometheus.user }}"
+        group: "{{ prometheus.group }}"
+        state: present
+
     - name: Check for default directories & create them
       ansible.builtin.file:
-        path: "{{ directories.config }}"
+        path: "{{ item }}"
         state: directory
         owner: "{{ prometheus.user }}"
         group: "{{ prometheus.group }}"
+        mode: 0775
+      with_items:
+        - "{{ prometheus.directories.config }}"
+        - "{{ prometheus.directories.data }}"
+
+- name: Download The Needed Files & Binaries
+  tags:
+    - prometheus_binaries
+    - prometheus_move_config_and_dir
+  block:
+    - name: Download binaries
+      ansible.builtin.get_url:
+        url: "{{ prometheus.download_url }}"
+        dest: "{{ prometheus.directories.temp }}"
+        owner: "{{ prometheus.user }}"
+        group: "{{ prometheus.group }}"
+        mode: 0666
+
+    - name: Move the binaries & directories to correct location
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ item }}"
+        owner: "{{ prometheus.user }}"
+        group: "{{ prometheus.group }}"
+        remote_src: true
+        mode: 0770
+      with_items:
+        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus_version }}.linux-amd64/prometheus"
+          dest: "/usr/local/bin/"
+        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus_version }}.linux-amd64/promtool"
+          dest: "/usr/local/bin/"
+        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus_version }}.linux-amd64/consoles/"
+          dest: "{{ prometheus.directories.config }}/"
+        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus_version }}.linux-amd64/console_libraries/"
+          dest: "{{ prometheus.directories.config }}/"
+
+- name: Install Needed Dependencies for Alretmanager
+  tags:
+    - prometheus_alertmanager
+    - prometheus_alertmanager_dependencies
+  block:
+    - name: Create Alretmanager group
+      ansible.builtin.group:
+        name: "{{ alretmanager.group }}"
+        state: present
+
+    - name: Create Alretmanager user
+      ansible.builtin.user:
+        name: "{{ alretmanager.user }}"
+        group: "{{ alretmanager.group }}"
+        state: present
+
+    - name: Create the needed directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ alertmanager.user }}"
+        group: "{{ alertmanager.group }}"
+        mode: 0775
+      with_items:
+        - "{{ alertmanager.directories.config }}"
+        - "{{ alertmanager.directories.data }}"
+
+    - name: Move the binaries & directories to correct location
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ item }}"
+        owner: "{{ alertmanager.user }}"
+        group: "{{ alertmanager.group }}"
+        remote_src: true
+        mode: 0770
+      with_items:
+        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager_version }}.linux-amd64/alertmanager"
+          dest: "/usr/local/bin/"
+        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager_version }}.linux-amd64/amtool"
+          dest: "/usr/local/bin/"
+        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager_version }}.linux-amd64/alertmanager.yml"
+          dest: "{{ alertmanager.directories.config }}/"
+

@@ -1,8 +1,19 @@
 ---
 # vars file for prometheus
-directories:
-  config: /etc/prometheus
-
 prometheus:
+  directories:
+    config: /etc/prometheus
+    data: /var/lib/prometheus
+    temp: /tmp/prometheus
   user: prometheus
   group: "{{ prometheus.user }}"
+  download_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+
+alretmanager:
+  directories:
+    config: /etc/alretmanager
+    data: /var/lib/alretmanager
+    temp: /tmp/alretmanager
+  user: alretmanager
+  group: "{{ alretmanager.user }}"
+  download_url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
