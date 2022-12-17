@@ -59,13 +59,13 @@
         remote_src: true
         mode: 0770
       with_items:
-        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus_version }}.linux-amd64/prometheus"
+        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus.version }}.linux-amd64/prometheus"
           dest: "/usr/local/bin/"
-        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus_version }}.linux-amd64/promtool"
+        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus.version }}.linux-amd64/promtool"
           dest: "/usr/local/bin/"
-        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus_version }}.linux-amd64/consoles/"
+        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus.version }}.linux-amd64/consoles/"
           dest: "{{ prometheus.directories.config }}/"
-        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus_version }}.linux-amd64/console_libraries/"
+        - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus.version }}.linux-amd64/console_libraries/"
           dest: "{{ prometheus.directories.config }}/"
 
 - name: Install Needed Dependencies for Alretmanager
@@ -110,4 +110,3 @@
           dest: "/usr/local/bin/"
         - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager_version }}.linux-amd64/alertmanager.yml"
           dest: "{{ alertmanager.directories.config }}/"
-

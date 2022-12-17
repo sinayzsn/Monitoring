@@ -1,7 +1,21 @@
 ---
 # defaults file for prometheus
-prometheus_version: "2.37.5"
-prometheus_config:
-  port: 9090
+prometheus_main_configurations:
+  global:
+    scrape_interval: "{{ prometheus.scrape_interval }}"
+    evaluation_interval: 5s
+    external_labels:
+      env: '{{ prometheus_env }}'
+  scrape_configs:
+    - job_name: prometheus
+      scrape_interval: 5m
+      static_configs:
+        - targets: ['{{ inventory_hostname }}:9090']
+    - job_name: node_exporter
 
-alertmanager_version: "0.23.0"
+prometheus_default:
+  port: 9090
+  version: "2.37.5"
+
+alertmanager:
+  version: "0.23.0"

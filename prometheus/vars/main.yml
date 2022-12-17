@@ -7,7 +7,9 @@ prometheus:
     temp: /tmp/prometheus
   user: prometheus
   group: "{{ prometheus.user }}"
-  download_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+  scrape_interval: "15s"
+  version: "{{ prometheus_default.version }}"
+  download_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus.version }}/prometheus-{{ prometheus.version }}.linux-amd64.tar.gz"
 
 alretmanager:
   directories:
@@ -16,4 +18,10 @@ alretmanager:
     temp: /tmp/alretmanager
   user: alretmanager
   group: "{{ alretmanager.user }}"
-  download_url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
+  download_url: >-
+    "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
+
+node_exporter:
+  enabled: true
+blackbox_exporter:
+  enabled: false
