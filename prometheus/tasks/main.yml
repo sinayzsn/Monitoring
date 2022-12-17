@@ -1,2 +1,15 @@
 ---
 # tasks file for prometheus
+- name: Install prometheus
+  ansible.builtin.include_tasks:
+    file: prometheus.yml
+
+- name: Install alertmanager
+  ansible.builtin.include_tasks:
+    file: alertmanager.yml
+  when: alertmanager
+
+- name: Update Alertmanager & Prometheus
+  ansible.builtin.include_tasks:
+    file: update.yml
+  when: alertmanager_update or prometheus_update

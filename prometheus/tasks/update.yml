@@ -1,0 +1,13 @@
+---
+- name: Update the Prometheus configuration
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: "{{ directories.config }}/prometheus.yml"
+    owner: "{{ prometheus.user }}"
+    group: "{{ prometheus.group }}"
+    mode: 0775
+  notify: Prometheus_restart
+  when: prometheus_update
+
+# - name: Update the Alertmanager configuration
+  # ansible.builtin.template:

@@ -1,0 +1,43 @@
+---
+- name: Install Needed Dependencies for Alretmanager
+  tags:
+    - prometheus_alertmanager
+    - prometheus_alertmanager_dependencies
+  block:
+    - name: Create Alretmanager group
+      ansible.builtin.group:
+        name: "{{ alretmanager.group }}"
+        state: present
+
+    - name: Create Alretmanager user
+      ansible.builtin.user:
+        name: "{{ alretmanager.user }}"
+        group: "{{ alretmanager.group }}"
+        state: present
+
+    - name: Create the needed directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ alertmanager.user }}"
+        group: "{{ alertmanager.group }}"
+        mode: 0775
+      with_items:
+        - "{{ alertmanager.directories.config }}"
+        - "{{ alertmanager.directories.data }}"
+
+    - name: Move the binaries & directories to correct location
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ item }}"
+        owner: "{{ alertmanager.user }}"
+        group: "{{ alertmanager.group }}"
+        remote_src: true
+        mode: 0770
+      with_items:
+        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager_version }}.linux-amd64/alertmanager"
+          dest: "/usr/local/bin/"
+        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager_version }}.linux-amd64/amtool"
+          dest: "/usr/local/bin/"
+        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager_version }}.linux-amd64/alertmanager.yml"
+          dest: "{{ alertmanager.directories.config }}/"

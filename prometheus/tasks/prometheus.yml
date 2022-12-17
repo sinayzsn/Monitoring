@@ -1,0 +1,67 @@
+---
+- name: Install needed services & update the system
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    update_cache: true
+    autoremove: true
+    clean: true
+  with_items:
+    - "'"
+    - "nginx"
+
+- name: Create Prometheus user & group
+  ansible.builtin.group:
+    name: "{{ prometheus.group }}"
+    state: present
+
+- name: Create Prometheus user
+  ansible.builtin.user:
+    name: "{{ prometheus.user }}"
+    group: "{{ prometheus.group }}"
+    state: present
+
+- name: Check for default directories & create them
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ prometheus.user }}"
+    group: "{{ prometheus.group }}"
+    mode: 0775
+  with_items:
+    - "{{ prometheus.directories.config }}"
+    - "{{ prometheus.directories.data }}"
+
+- name: Download binaries
+  ansible.builtin.get_url:
+    url: "{{ prometheus.download_url }}"
+    dest: "{{ prometheus.directories.temp }}"
+    owner: "{{ prometheus.user }}"
+    group: "{{ prometheus.group }}"
+    mode: 0775
+
+- name: Move the binaries & directories to correct location
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ item }}"
+    owner: "{{ prometheus.user }}"
+    group: "{{ prometheus.group }}"
+    remote_src: true
+    mode: 0770
+  with_items:
+    - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus.version }}.linux-amd64/prometheus"
+      dest: "/usr/local/bin/"
+    - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus.version }}.linux-amd64/promtool"
+      dest: "/usr/local/bin/"
+    - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus.version }}.linux-amd64/consoles/"
+      dest: "{{ prometheus.directories.config }}/"
+    - src: "{{ prometheus.directories.temp }}/prometheus-{{ prometheus.version }}.linux-amd64/console_libraries/"
+      dest: "{{ prometheus.directories.config }}/"
+
+- name: Configure Prometheus configurations
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: "{{ directories.config }}/prometheus.yml"
+    owner: "{{ prometheus.user }}"
+    group: "{{ prometheus.group }}"
+    mode: 0775
+  notify: Prometheus_restart
