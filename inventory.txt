@@ -1,0 +1,6 @@
+[monitoring_servers]
+localhost
+
+[node_exporter_servers]
+
+[blackbox_servers]
