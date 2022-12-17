@@ -1,0 +1,19 @@
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Restart=always
+Type=simple
+ExecStart=/usr/local/bin/prometheus \
+    --config.file={{ directories.config }}/prometheus.yml \
+    --storage.tsdb.path={{ directories,data }}/prometheus/ \
+    --web.console.templates={{ directories.config }}/consoles \
+    --web.console.libraries={{ directories.config }}/console_libraries \
+    --web.listen-address=0.0.0.0:{{ prometheus_config.port}}
+
+[Install]
+WantedBy=multi-user.target
