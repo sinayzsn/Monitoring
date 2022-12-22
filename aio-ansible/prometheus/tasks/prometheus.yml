@@ -11,21 +11,21 @@
 
 - name: Create Prometheus user & group
   ansible.builtin.group:
-    name: "{{ prometheus.group }}"
+    name: "{{ prometheus_group }}"
     state: present
 
 - name: Create Prometheus user
   ansible.builtin.user:
-    name: "{{ prometheus.user }}"
-    group: "{{ prometheus.group }}"
+    name: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
     state: present
 
 - name: Check for default directories & create them
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ prometheus.user }}"
-    group: "{{ prometheus.group }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
     mode: 0775
   with_items:
     - "{{ prometheus.directories.config }}"
@@ -35,16 +35,16 @@
   ansible.builtin.get_url:
     url: "{{ prometheus.download_url }}"
     dest: "{{ prometheus.directories.temp }}"
-    owner: "{{ prometheus.user }}"
-    group: "{{ prometheus.group }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
     mode: 0775
 
 - name: Move the binaries & directories to correct location
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ item }}"
-    owner: "{{ prometheus.user }}"
-    group: "{{ prometheus.group }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
     remote_src: true
     mode: 0770
   with_items:
@@ -61,7 +61,7 @@
   ansible.builtin.template:
     src: prometheus.yml.j2
     dest: "{{ directories.config }}/prometheus.yml"
-    owner: "{{ prometheus.user }}"
-    group: "{{ prometheus.group }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
     mode: 0775
   notify: Prometheus_restart

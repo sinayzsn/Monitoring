@@ -35,9 +35,9 @@
         remote_src: true
         mode: 0770
       with_items:
-        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager_version }}.linux-amd64/alertmanager"
+        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager.version }}.linux-amd64/alertmanager"
           dest: "/usr/local/bin/"
-        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager_version }}.linux-amd64/amtool"
+        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager.version }}.linux-amd64/amtool"
           dest: "/usr/local/bin/"
-        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager_version }}.linux-amd64/alertmanager.yml"
+        - src: "{{ alertmanager.directories.temp }}/alertmanager-{{ alertmanager.version }}.linux-amd64/alertmanager.yml"
           dest: "{{ alertmanager.directories.config }}/"
